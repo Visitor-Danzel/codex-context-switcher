@@ -36,9 +36,9 @@ for package,names in {'ContextSettings':['__init__.py','config_file.py','attribu
  (res/package).mkdir()
  for name in names:shutil.copy2(project/'Sources'/package/name,res/package/name)
 (res/'catalog-record.json').write_text(json.dumps(record,indent=2)+'\n')
-plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.1','CFBundleVersion':'9','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
+plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.2','CFBundleVersion':'10','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(plist))
-source_paths=[project/'Sources/CodexContextSwitcherApp'/name for name in ['main.m','RepairCandidate.h','MaximumContext.h','ContextRepairSession.h','ContextRepairSession.m','legacy_context_readout.py']]
+source_paths=[project/'Sources/CodexContextSwitcherApp'/name for name in ['main.m','RepairCandidate.h','MaximumContext.h','MaximumLanguage.h','ContextRepairSession.h','ContextRepairSession.m','legacy_context_readout.py']]
 source_paths += [project/'Sources/CodexContextCore'/name for name in ['CodexContextCore.h','CodexContextCore.m']]
 source_paths += [p for package in ['ContextSettings','ModelContextSettings'] for p in sorted((project/'Sources'/package).glob('*.py'))]
 record['source_sha256']={str(p.relative_to(project)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
