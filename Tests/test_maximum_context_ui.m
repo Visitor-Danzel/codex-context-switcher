@@ -1,6 +1,14 @@
 #define main CCRepairMainForTests
 #import "../Sources/CodexContextSwitcherApp/RepairCandidate.h"
 #undef main
+// A language change must never enter inspection or configuration operations.
+@interface CCLanguageTestDelegate : CCMaximumContextDelegate
+@property(nonatomic) NSUInteger unexpectedOperations;
+@end
+@implementation CCLanguageTestDelegate
+- (void)refresh:(id)sender {(void)sender;self.unexpectedOperations++;}
+- (void)prepare:(NSString *)action {(void)action;self.unexpectedOperations++;}
+@end
 static int failures=0,checks=0;
 #define CHECK(c,m) do{checks++;if(!(c)){failures++;fprintf(stderr,"FAIL: %s\n",m);}}while(0)
 int main(void){@autoreleasepool{
@@ -9,7 +17,7 @@ int main(void){@autoreleasepool{
  Class cls=NSClassFromString(@"CCMaximumContextDelegate");
  CHECK(cls!=nil,"Missing functional maximum-context window");
  if(cls){
-  id d=[cls new];[d performSelector:NSSelectorFromString(@"buildWindow")];
+  id d=[CCLanguageTestDelegate new];[d performSelector:NSSelectorFromString(@"buildWindow")];
   NSWindow *window=[d valueForKey:@"window"];
   CHECK(window!=nil,"maximum context has one understandable window");
   NSDictionary *status=@{@"state":@"configured",@"selected":@[@"a"],@"runtime_compatible":@YES,
@@ -28,6 +36,44 @@ int main(void){@autoreleasepool{
   CHECK(([[d valueForKey:@"selection"] isEqual:[NSSet setWithArray:@[@"a",@"b"]]]),"toggle drafts only the requested model");
   CHECK([[d valueForKey:@"saveButton"] isEnabled],"changed selection enables actual save");
   CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:@"未保存"],"draft is visibly distinct from saved settings");
+  SEL languageAction=NSSelectorFromString(@"changeLanguage:");
+  CHECK([d respondsToSelector:languageAction],"English display option is available");
+  if([d respondsToSelector:languageAction]){
+   NSPopUpButton *picker=[d valueForKey:@"languagePicker"];
+   CHECK(picker.numberOfItems==2 && picker.indexOfSelectedItem==0,"Chinese stays the default with one English option");
+   NSSet *draft=[[d valueForKey:@"selection"] copy];
+   id statusIdentity=[d valueForKey:@"status"];
+   NSArray *sameButtons=[[d valueForKey:@"modelButtons"] copy];
+   NSPoint scrollPosition=[[[d valueForKey:@"scroll"] contentView] bounds].origin;
+   for(NSInteger i=0;i<4;i++){
+    BOOL english=i%2==0;[picker selectItemAtIndex:english?1:0];[d performSelector:languageAction withObject:picker];
+    CHECK([[d valueForKey:@"selection"] isEqual:draft] && [d valueForKey:@"status"]==statusIdentity,"language change preserves unsaved selection and configuration snapshot");
+    CHECK([[d valueForKey:@"modelButtons"] isEqual:sameButtons],"language only relabels existing model controls");
+    CHECK(NSEqualPoints(scrollPosition,[[[d valueForKey:@"scroll"] contentView] bounds].origin),"language preserves model list position");
+    CHECK([[d valueForKey:@"saveButton"] isEnabled] && [[d valueForKey:@"undoButton"] isEnabled] && ![sameButtons[2] isEnabled],"language preserves saving, undo and fixed-model availability");
+    CHECK([sameButtons[0] state]==NSControlStateValueOn && [sameButtons[1] state]==NSControlStateValueOn,"language never changes checked models");
+    CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:english?@"Unsaved":@"未保存"],"unsaved status follows the selected display language");
+   }
+   [picker selectItemAtIndex:1];[d performSelector:languageAction withObject:picker];
+   CHECK([[[d valueForKey:@"saveButton"] title] isEqual:@"Save"] && [[sameButtons[1] title] isEqual:@"Use maximum"],"English labels are visible on action and model buttons");
+   for(NSString *key in @[@"saveButton",@"defaultsButton",@"undoButton",@"refreshButton"]){
+    NSButton *b=[d valueForKey:key];if(b.cell.cellSize.width>b.frame.size.width)fprintf(stderr,"Clipped: %s, needed %.1f, available %.1f\n",b.title.UTF8String,b.cell.cellSize.width,b.frame.size.width);CHECK(b.cell.cellSize.width<=b.frame.size.width,"English action labels fit without clipping");
+   }
+   [d performSelector:NSSelectorFromString(@"setSummary:") withObject:@"已保存。重新打开 Codex，在新聊天中使用。"];
+   [picker selectItemAtIndex:0];[d performSelector:languageAction withObject:picker];
+   CHECK([[[d valueForKey:@"summaryLabel"] stringValue] hasPrefix:@"已保存"],"language preserves a completed-save message");
+   [d performSelector:NSSelectorFromString(@"setSummary:") withObject:MaximumReason(@"desktop_check_unavailable")];
+   [picker selectItemAtIndex:1];[d performSelector:languageAction withObject:picker];
+   CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:@"cannot confirm"],"language preserves and translates process-query errors");
+   NSButton *englishSecond=sameButtons[1];englishSecond.state=NSControlStateValueOff;
+   [d performSelector:NSSelectorFromString(@"toggleModel:") withObject:englishSecond];
+   CHECK([sameButtons[0] isEnabled] && [sameButtons[1] isEnabled] && ![sameButtons[2] isEnabled],"English tooltips do not break model eligibility after toggling");
+   [d setValue:@YES forKey:@"busy"];[d performSelector:NSSelectorFromString(@"updateControls")];
+   [picker selectItemAtIndex:0];[d performSelector:languageAction withObject:picker];
+   CHECK([[d valueForKey:@"busy"] boolValue] && ![[d valueForKey:@"saveButton"] isEnabled] && ![sameButtons[0] isEnabled],"language preserves a busy operation and disabled controls");
+   CHECK([(CCLanguageTestDelegate *)d unexpectedOperations]==0,"language never starts a refresh, preview or save");
+   [d setValue:@NO forKey:@"busy"];
+  }
   [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:status];
   CHECK(![[d valueForKey:@"saveButton"] isEnabled],"unchanged configuration not re-saved");
   CHECK([[d valueForKey:@"undoButton"] isEnabled],"previous real save can be manually undone");
