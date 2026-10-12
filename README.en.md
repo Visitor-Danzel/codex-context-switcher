@@ -6,6 +6,12 @@ A macOS maximum-context switcher with individual model selections. Version **2.2
 
 Select the models you want to expand, save, and restart Codex. Unselected models retain their default context. The tool supports restoring defaults, undoing the last save, and reading the actual configuration again after you quit and reopen the tool.
 
+## Application icon
+
+<img src="AppIcon.png" width="128" height="128" alt="Codex Context Switcher application icon">
+
+The icon resources are included with the source and are automatically packaged during a normal build. No separate download is needed. The icon update changes no functionality or settings.
+
 ## Interface language
 
 Choose **中文** or **English** at the top right. Chinese is the default. Switching languages only changes interface labels, messages, and dialogs. It does not save or refresh the configuration, change model selections or unsaved choices, or change which controls are enabled. The language choice lasts for the current run only; reopening the tool restores Chinese. No language preference is written to the Codex configuration.

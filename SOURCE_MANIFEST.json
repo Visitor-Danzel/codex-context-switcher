@@ -9,7 +9,7 @@
     "Sources/CodexContextSwitcherApp/legacy_context_readout.py": "0ef205235709369246e78a85bf21a38a806f89a1bdaeb0cb8e740deddc6f88e4",
     "Sources/CodexContextCore/CodexContextCore.h": "cc82461276e1ee4937142f5ea5f75f57e19a82e671fc097d3f70d8f4a64b5a6d",
     "Sources/CodexContextCore/CodexContextCore.m": "3daabab462c1c2c6b2b686ae9db12f6fe6627344770426d3d762eed3ffd19c22",
-    "scripts/build-context-repair-candidate.sh": "fc456ee20a43e688d9015ad5599a5e6162a3119c70d6635ca9d428b98e7205b1",
+    "scripts/build-context-repair-candidate.sh": "28960e97bb1c9dc8b9ef9dd0af01f11faa993a27173587164fc6a425a1dce9f3",
     "Tests/context_settings_fixtures.py": "f3f48cde6cfd0cf9355fa1ed676677bdd6c2fcd5600e5740a3a51cfc2ff1ae7d",
     "Tests/test_model_context_settings.py": "f78188793b08f7bbf62bb305a8d2551c6b895bfe8d7a939d2d46fb8f46086252",
     "Tests/test_model_context_worker.py": "5ceddb6aaf4b8a7ac5e1c55892129908876b2a767c63cf3d66cac08ace1fc0a0",
@@ -39,10 +39,10 @@
   },
   "files": {
     ".gitignore": "cd4809d4e1a7aa6b72841b812af771c1d9ba8529a25432bbde9b9f8267242a60",
-    "ACCEPTANCE.en.md": "39077ee77c6603e2f84855315f5605923b56d2d2b30841a9628610ea1d40f06a",
-    "ACCEPTANCE.md": "e96c0fc305bf24c9e5da121bef578cbe50d88659329d6760709dc3b5b9afee85",
-    "README.en.md": "9e765672934c820f0423c01ba3902f47c423dcc05ab2b0d0001457fd0896bfa7",
-    "README.md": "5f493eaa37968651fede01ca2d95d71b1d1cd0156a98a0c66a1cc082847c0f40",
+    "ACCEPTANCE.en.md": "2bf8e4b6114e416ea011ee880f65bd43c32d1f9f422e3762d82607f83afdf1aa",
+    "ACCEPTANCE.md": "b246ee195121027a96d16276f500000a382ac9129abd50cfc8b52cf758a02fdf",
+    "README.en.md": "b61f69b79df3626ba9b531c7f7c292bcc11aa951b44fbf32a0d1af7d041fd6a5",
+    "README.md": "cb85af67bee36867e5a0ceaf41ddf9755934d6488f631d0a796af2ccd70d3e9e",
     "Sources/CodexContextCore/CodexContextCore.h": "cc82461276e1ee4937142f5ea5f75f57e19a82e671fc097d3f70d8f4a64b5a6d",
     "Sources/CodexContextCore/CodexContextCore.m": "3daabab462c1c2c6b2b686ae9db12f6fe6627344770426d3d762eed3ffd19c22",
     "Sources/CodexContextSwitcherApp/ContextRepairSession.h": "2114d7e8c32fc8cf3093d4cdc4ed898b35e2730d3744d36e9c033a8e7d6606e4",
@@ -77,8 +77,10 @@
     "Tests/test_maximum_context_ui.m": "f778fdf1e0c5b00a2a645ea0d5e07c97a88377967363d1e483cb173e2e361915",
     "Tests/test_model_context_settings.py": "f78188793b08f7bbf62bb305a8d2551c6b895bfe8d7a939d2d46fb8f46086252",
     "Tests/test_model_context_worker.py": "5ceddb6aaf4b8a7ac5e1c55892129908876b2a767c63cf3d66cac08ace1fc0a0",
-    "scripts/build-context-repair-candidate.sh": "fc456ee20a43e688d9015ad5599a5e6162a3119c70d6635ca9d428b98e7205b1",
-    "scripts/test-maximum-context.sh": "241ac4e5d6657aec65f6e39acba41186a84a20fe7a9c9dca3b62ebfe58a123f8"
+    "scripts/build-context-repair-candidate.sh": "28960e97bb1c9dc8b9ef9dd0af01f11faa993a27173587164fc6a425a1dce9f3",
+    "scripts/test-maximum-context.sh": "241ac4e5d6657aec65f6e39acba41186a84a20fe7a9c9dca3b62ebfe58a123f8",
+    "AppIcon.png": "12aa45115b981e7eaac58c23c245c3fe334fd83e0779ace3ae47084fc6e4d45a",
+    "AppIcon.icns": "a8efc47d894b2056fb511f7d4166bf597aaf44411d7dcba48f0e8d5c88193af1"
   },
   "transforms": {
     "Sources/CodexContextSwitcherApp/main.m": "active compile branch only",

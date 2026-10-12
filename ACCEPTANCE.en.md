@@ -24,3 +24,7 @@ The interface now offers Chinese or English, with Chinese as the default. The ch
 The 15 core files and the worker/sandbox function bodies are byte-for-byte identical to the accepted version. This update did not modify the user’s real configuration.
 
 After rebuilding the final public source copy, all 68 tests, 14 runtime checks, 7 isolation checks, and 49 UI checks passed: 138 in total, with zero failures and zero skips. Strict signature verification passed.
+
+## Application icon update
+
+The application now packages the user-approved blue-purple conversation icon. Its file icon and preview were verified in the actual Finder interface. The icon includes standard and Retina sizes. All 19 functional source files and all existing application resources remain byte-for-byte unchanged; application metadata only adds the icon declaration. After independently rebuilding the public source, all existing 138 checks passed again with zero failures and zero skips, and strict signature verification passed. This update did not modify the real configuration.
