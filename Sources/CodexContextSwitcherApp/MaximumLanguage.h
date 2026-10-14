@@ -14,7 +14,7 @@ static NSString *MaximumText(NSString *chinese) {
    @"恢复默认":@"Defaults",
    @"撤销上次保存":@"Undo last save",
    @"刷新":@"Refresh",
-   @"保存后请重新打开 Codex，并在新聊天中使用。\n这里显示配置状态；当前聊天是否采用这些设置：未确认。":@"Restart Codex after saving, then use a new chat.\nThis shows configuration status; adoption by the current chat is unconfirmed.",
+   @"上方显示已保存的配置。保存后请重新打开 Codex，并使用新聊天。\n本工具不自动检测聊天实际容量，请在 Codex 上下文圆环中查看。":@"Saved configuration is shown above. Restart Codex after saving and use a new chat.\nThis tool does not detect chat capacity; check Codex’s context ring.",
    @"检查上次保存":@"Check last save",
    @"可扩展":@"Can be expanded",
    @"正在处理，请稍候…":@"Working, please wait…",

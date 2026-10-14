@@ -121,7 +121,7 @@ static NSString *MaximumReason(NSString *reason) {
  self.undoButton=[self button:MaximumText(@"撤销上次保存") action:@selector(undo:) frame:NSMakeRect(272,96,145,34)];
  self.refreshButton=[self button:MaximumText(@"刷新") action:@selector(refresh:) frame:NSMakeRect(532,96,104,34)];
  for(NSButton *b in @[self.saveButton,self.defaultsButton,self.undoButton,self.refreshButton])[view addSubview:b];
- self.footnote=[self text:MaximumText(@"保存后请重新打开 Codex，并在新聊天中使用。\n这里显示配置状态；当前聊天是否采用这些设置：未确认。") frame:NSMakeRect(24,36,612,48) size:12];self.footnote.textColor=NSColor.secondaryLabelColor;[view addSubview:self.footnote];
+ self.footnote=[self text:MaximumText(@"上方显示已保存的配置。保存后请重新打开 Codex，并使用新聊天。\n本工具不自动检测聊天实际容量，请在 Codex 上下文圆环中查看。") frame:NSMakeRect(24,36,612,48) size:12];self.footnote.textColor=NSColor.secondaryLabelColor;[view addSubview:self.footnote];
  [self updateControls];[self.window center];
 }
 - (void)renderSummary {
@@ -139,7 +139,7 @@ static NSString *MaximumReason(NSString *reason) {
  self.saveButton.title=MaximumText(@"保存");self.defaultsButton.title=MaximumText(@"恢复默认");
  self.undoButton.title=MaximumText([self.status[@"transaction_state"] isEqual:@"uncertain"]?@"检查上次保存":@"撤销上次保存");
  self.refreshButton.title=MaximumText(@"刷新");self.quitItem.title=MaximumText(@"退出最大上下文");
- self.footnote.stringValue=MaximumText(@"保存后请重新打开 Codex，并在新聊天中使用。\n这里显示配置状态；当前聊天是否采用这些设置：未确认。");
+ self.footnote.stringValue=MaximumText(@"上方显示已保存的配置。保存后请重新打开 Codex，并使用新聊天。\n本工具不自动检测聊天实际容量，请在 Codex 上下文圆环中查看。");
  NSArray *rows=self.status[@"models"] ?: @[];
  for(NSUInteger i=0;i<self.modelButtons.count && i<rows.count;i++) {
   NSDictionary *row=rows[i];NSButton *button=self.modelButtons[i];
