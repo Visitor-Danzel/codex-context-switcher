@@ -37,7 +37,8 @@ for package,names in {'ContextSettings':['__init__.py','config_file.py','attribu
  for name in names:shutil.copy2(project/'Sources'/package/name,res/package/name)
 (res/'catalog-record.json').write_text(json.dumps(record,indent=2)+'\n')
 shutil.copy2(project/'AppIcon.icns',res/'AppIcon.icns')
-plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.2','CFBundleVersion':'10','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
+shutil.copy2(project/'LICENSE',res/'LICENSE')
+plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.3','CFBundleVersion':'11','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
 plist['CFBundleIconFile']='AppIcon.icns'
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(plist))
 source_paths=[project/'Sources/CodexContextSwitcherApp'/name for name in ['main.m','RepairCandidate.h','MaximumContext.h','MaximumLanguage.h','ContextRepairSession.h','ContextRepairSession.m','legacy_context_readout.py']]
