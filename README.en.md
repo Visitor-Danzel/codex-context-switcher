@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-A macOS maximum-context switcher with individual model selections. Version **2.2.2 / 10**.
+A macOS maximum-context switcher with individual model selections. Version **2.2.3 / 11**.
 
 Select the models you want to expand, save, and restart Codex. Unselected models retain their default context. The tool supports restoring defaults, undoing the last save, and reading the actual configuration again after you quit and reopen the tool.
 
@@ -47,6 +47,8 @@ Restricted child processes are denied network access and access to chat database
 
 Build first, then run `sh scripts/test-maximum-context.sh`. This command runs an explicit list of tests with isolated configuration fixtures; it does not replace real desktop acceptance. See [ACCEPTANCE.en.md](ACCEPTANCE.en.md) for evidence and limits. Actual saving, manual undo, switcher restart recognition, and a new native Astra chat displaying 828k were accepted in version 2.2.1 / 9. Version 2.2.2 / 10 adds display translation while preserving the underlying configuration and protection code.
 
+Version 2.2.3 / 11 adds the MIT License and clarifies the footer: the saved configuration is shown above, and this tool does not automatically detect a chat’s actual capacity. Saving, undo, permissions, and the icon are unchanged. After the user reported updating the desktop client, local checks found the same bundled CLI version, `0.162.0-alpha.17.2`, and matching CLI binary. This does not automatically establish capacity acceptance for every new chat.
+
 ## Official configuration references
 
 - [Model catalogs and startup loading](https://learn.chatgpt.com/docs/enterprise/roll-out-a-gateway)
@@ -54,4 +56,4 @@ Build first, then run `sh scripts/test-maximum-context.sh`. This command runs an
 
 ## License
 
-No code license has been selected, so no reuse permission is granted through an open-source license. A public repository alone does not grant such a license. Automatic model routing, quota features, and other product work are outside this release’s scope.
+This project is licensed under the [MIT License](LICENSE). Use, modification, distribution, and commercial use are permitted with preservation of the copyright and license notices. Modified versions need not remain open source. The software is provided as is. Automatic model routing, quota features, and other product work are outside this release’s scope.

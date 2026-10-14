@@ -2,7 +2,7 @@
 
 [中文](ACCEPTANCE.md) | English
 
-Current version: **2.2.2 / 10**. Supported bundled CLI: **0.162.0-alpha.17.2**. The real-configuration and native-chat acceptance below was performed with version 2.2.1 / 9. Its configuration-processing and protection code is unchanged in this translation update.
+Current version: **2.2.3 / 11**. Supported bundled CLI: **0.162.0-alpha.17.2**. The real-configuration and native-chat acceptance below was performed with version 2.2.1 / 9. Its configuration-processing and protection code is unchanged in this translation update.
 
 | Item | Result and evidence |
 | --- | --- |
@@ -25,6 +25,12 @@ The 15 core files and the worker/sandbox function bodies are byte-for-byte ident
 
 After rebuilding the final public source copy, all 68 tests, 14 runtime checks, 7 isolation checks, and 49 UI checks passed: 138 in total, with zero failures and zero skips. Strict signature verification passed.
 
-## Application icon update
+## Application icon update (2.2.2 / 10)
 
 The application now packages the user-approved blue-purple conversation icon. Its file icon and preview were verified in the actual Finder interface. The icon includes standard and Retina sizes. All 19 functional source files and all existing application resources remain byte-for-byte unchanged; application metadata only adds the icon declaration. After independently rebuilding the public source, all existing 138 checks passed again with zero failures and zero skips, and strict signature verification passed. This update did not modify the real configuration.
+
+## License and footer update (2.2.3 / 11)
+
+The MIT License is included in the source package and built application resources. The Chinese and English footer separates saved configuration from actual chat capacity while retaining the restart reminder. Both language views were inspected in the actual window, and model selections were preserved. Apart from the footer strings in two UI headers, the other 17 functional source files remain byte-for-byte unchanged, as do the existing tests and icon. The build was regenerated and all explicitly listed isolated checks were run.
+
+After the user reported a desktop update, local checks found the same bundled CLI version, 0.162.0-alpha.17.2, binary digest, and model catalog as before. No configuration-processing or permission change was needed, and this update does not claim fresh capacity acceptance for the current chat.
