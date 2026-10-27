@@ -83,6 +83,13 @@ int main(void){@autoreleasepool{
   CHECK([[d valueForKey:@"defaultsButton"] isEnabled],"outdated trusted catalog can restore defaults");
   CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:@"模型清单需要更新"],"normal upgrade is not described as damage");
   CHECK([[[d valueForKey:@"modelButtons"] objectAtIndex:0] state]==NSControlStateValueOn,"upgrade keeps the prior checked model");
+  NSMutableDictionary *paused=[outdated mutableCopy];paused[@"catalog_route_paused"]=@YES;
+  [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:paused];
+  CHECK(![[d valueForKey:@"saveButton"] isEnabled],"production catalog writes are paused");
+  CHECK(![[[d valueForKey:@"modelButtons"] objectAtIndex:0] isEnabled],"production cannot draft another catalog override");
+  CHECK([[d valueForKey:@"defaultsButton"] isEnabled],"explicit withdrawal remains available");
+  CHECK(![[d valueForKey:@"undoButton"] isEnabled],"undo cannot reinstall the paused model list");
+  CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:@"接管原生模型列表"],"native-list side effect is plainly disclosed");
   NSMutableDictionary *updated=[status mutableCopy];updated[@"runtime_compatible"]=@NO;
   [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:updated];
   CHECK(![[d valueForKey:@"saveButton"] isEnabled],"Codex update blocks stale catalog writes");
