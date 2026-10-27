@@ -22,7 +22,7 @@ class CandidateTests(unittest.TestCase):
   before=set(self.root.iterdir());rc,r=self.run_tool('--status');self.assertEqual(rc,0,r)
   self.assertEqual(set(self.root.iterdir()),before)
   self.assertTrue({'gpt-6.1-sol','gpt-6-sol','gpt-6-luna'}.issubset(self.states(r)))
-  self.assertEqual(len(r['models']),11);self.assertFalse(r['chat_verified']);self.assertFalse(r['real_settings_writable'])
+  source=json.loads((APP/'Contents/Resources/current-models.json').read_text());self.assertEqual([m['slug'] for m in r['models']],[m['slug'] for m in source['models']]);self.assertFalse(r['chat_verified']);self.assertFalse(r['real_settings_writable'])
  def test_independent_save_new_process_undo_defaults(self):
   rc,a=self.run_tool('--toggle','gpt-6-astra');self.assertEqual(rc,0,a)
   self.assertTrue(self.states(a)['gpt-6-astra']);self.assertFalse(self.states(a)['gpt-6.1-sol'])

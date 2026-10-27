@@ -25,7 +25,8 @@ class PackagedSwitchTests(unittest.TestCase):
  def apply(self,preview,expect=True):return self.call({'operation':'apply','preview':preview,'confirmation':preview['confirmation'],'exclusive_edit':True},expect)
  def test_save_restart_undo_default_from_actual_package(self):
   before=set(self.root.iterdir());status=self.call({'operation':'inspect'})['result'];self.assertEqual(set(self.root.iterdir()),before)
-  self.assertEqual(len(status['models']),11)
+  source=json.loads((APP/'Contents/Resources/current-models.json').read_text())
+  self.assertEqual([m['slug'] for m in status['models']],[m['slug'] for m in source['models']])
   self.apply(self.preview('save',['gpt-6-astra']))
   first=self.config.read_bytes();path=Path(tomllib.loads(first.decode())['model_catalog_json'])
   actual=json.loads(path.read_text());source=json.loads((APP/'Contents/Resources/current-models.json').read_text())

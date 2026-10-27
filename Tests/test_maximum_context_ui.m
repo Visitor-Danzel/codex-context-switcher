@@ -77,6 +77,12 @@ int main(void){@autoreleasepool{
   [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:status];
   CHECK(![[d valueForKey:@"saveButton"] isEnabled],"unchanged configuration not re-saved");
   CHECK([[d valueForKey:@"undoButton"] isEnabled],"previous real save can be manually undone");
+  NSMutableDictionary *outdated=[status mutableCopy];outdated[@"state"]=@"catalog_outdated";
+  [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:outdated];
+  CHECK([[d valueForKey:@"saveButton"] isEnabled],"outdated trusted catalog can migrate without changing its selection");
+  CHECK([[d valueForKey:@"defaultsButton"] isEnabled],"outdated trusted catalog can restore defaults");
+  CHECK([[[d valueForKey:@"summaryLabel"] stringValue] containsString:@"模型清单需要更新"],"normal upgrade is not described as damage");
+  CHECK([[[d valueForKey:@"modelButtons"] objectAtIndex:0] state]==NSControlStateValueOn,"upgrade keeps the prior checked model");
   NSMutableDictionary *updated=[status mutableCopy];updated[@"runtime_compatible"]=@NO;
   [d performSelector:NSSelectorFromString(@"acceptStatus:") withObject:updated];
   CHECK(![[d valueForKey:@"saveButton"] isEnabled],"Codex update blocks stale catalog writes");
