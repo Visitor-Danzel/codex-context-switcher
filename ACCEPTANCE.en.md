@@ -2,7 +2,7 @@
 
 [中文](ACCEPTANCE.md) | English
 
-Current version: **2.2.3 / 11**. Supported bundled CLI: **0.162.0-alpha.17.2**. The real-configuration and native-chat acceptance below was performed with version 2.2.1 / 9. Its configuration-processing and protection code is unchanged in this translation update.
+Current version: **2.2.4 / 12**. Supported bundled CLI: **0.165.0-alpha.1.2**. The real-configuration and native-chat acceptance below was performed with version 2.2.1 / 9. Its configuration-processing and protection code is unchanged in this translation update.
 
 | Item | Result and evidence |
 | --- | --- |
@@ -34,3 +34,9 @@ The application now packages the user-approved blue-purple conversation icon. It
 The MIT License is included in the source package and built application resources. The Chinese and English footer separates saved configuration from actual chat capacity while retaining the restart reminder. Both language views were inspected in the actual window, and model selections were preserved. Apart from the footer strings in two UI headers, the other 17 functional source files remain byte-for-byte unchanged, as do the existing tests and icon. The build was regenerated and all explicitly listed isolated checks were run.
 
 After the user reported a desktop update, local checks found the same bundled CLI version, 0.162.0-alpha.17.2, binary digest, and model catalog as before. No configuration-processing or permission change was needed, and this update does not claim fresh capacity acceptance for the current chat.
+
+## Client compatibility and safe migration (2.2.4 / 12)
+
+Supports bundled CLI 0.165.0-alpha.1.2 and its complete 12-model catalog. Reviewed historical identity fingerprints are included without distributing the original generated catalogs. Recognized upgrades preserve selections; unknown or altered catalogs remain blocked. New-model settings, migration, Defaults, Undo, external-change protections, and both UI languages are verified using isolated fixtures. Two fixed-count assertions now compare complete model identities. The native application is unchanged and real settings are not switched automatically. The native model list and chat capacity require user-confirmed saving and a Codex restart; isolated results are not real-configuration acceptance.
+
+The final public source was independently built: all 79 tests, 14 runtime checks, 7 isolation checks, and 53 actual AppKit UI checks passed, for 153 total, with zero failures or skips; strict signature verification passed. Additional packaged end-to-end checks passed for the real old 11-model snapshot migrating to the current 12-model snapshot, preserved Sol selection, all new official fields, exact Undo, Defaults and Undo, and independent Terra selection. The current official CLI loaded both saved isolated catalogs. The Defaults edge found by independent review was fixed and regression-tested; follow-up review found no remaining blockers.

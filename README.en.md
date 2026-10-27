@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-A macOS maximum-context switcher with individual model selections. Version **2.2.3 / 11**.
+A macOS maximum-context switcher with individual model selections. Version **2.2.4 / 12**.
 
 Select the models you want to expand, save, and restart Codex. Unselected models retain their default context. The tool supports restoring defaults, undoing the last save, and reading the actual configuration again after you quit and reopen the tool.
 
@@ -27,9 +27,21 @@ To check a native chat’s context capacity, press `⌘,` in Codex to open Setti
 
 Codex must be closed during saving to avoid concurrent configuration edits. Restarting after saving is necessary because Codex loads the model catalog at startup. Closing the switcher does not automatically revert settings. Reopening it reads the current configuration again.
 
+## Client updates, missing models, and saved-catalog upgrades
+
+This tool does not modify the native Codex application, but its saved `model_catalog_json` setting controls the native model list's data source. A local catalog takes precedence over online model discovery. It is a snapshot from the installed client at build time, and does not automatically add later models. Updating Codex while retaining an old catalog can therefore hide new models.
+
+Version 2.2.4 / 12 supports the complete 12-model catalog from bundled CLI `0.165.0-alpha.1.2`, including GPT-6.1-Terra (default 500000, maximum 872000 tokens). Only selected context values change; all other fields come from the complete current official snapshot. This does not grant model access.
+
+To upgrade, open the new tool and check that your previous selections are preserved. If it says the catalog needs updating, fully quit Codex and the official CLI, close configuration editors, then click Save and confirm. Reopen Codex and check Advanced in the model picker. Replacing the tool alone does not write real settings or immediately expand an existing chat.
+
+Migration requires a tool-owned content-addressed path and a match against reviewed historical catalog metadata, every model's other fields, and valid historical context values. Unknown catalogs, modified non-context fields, and invalid limits remain blocked. Old files are preserved and the configuration is backed up before saving. Explicit Defaults and manual Undo remain available. Undo can restore the older catalog, which can hide newer models again. External configuration changes are never silently rolled back.
+
+If a future model is missing, update the tool and save as above, or explicitly restore defaults after quitting Codex to use native discovery again. Do not delete files, bypass checks, or re-sign Codex to repair the model list. See the official [catalog documentation](https://learn.chatgpt.com/docs/model-catalogs) and [Terra announcement](https://learn.chatgpt.com/docs/whats-new/october-26-30-2026).
+
 ## Supported environment
 
-Tested on macOS arm64 with the desktop-bundled CLI `0.162.0-alpha.17.2`, under `/Applications/ChatGPT.app`. The model catalog is obtained from the locally installed official CLI in an isolated environment and is not distributed with this source. In the matched catalog, expandable models such as Astra have default context 272000 and maximum context 872000. Values depend on the catalog bundled with the matching version.
+Tested on macOS arm64 with the desktop-bundled CLI `0.165.0-alpha.1.2`, under `/Applications/ChatGPT.app`. The model catalog is obtained from the locally installed official CLI in an isolated environment and is not distributed with this source. In the matched catalog, expandable models such as Astra have default context 272000 and maximum context 872000. Values depend on the catalog bundled with the matching version.
 
 This tool changes a local setting supported by the official configuration mechanism. It does not bypass server, account, or model limits, and does not guarantee immediate expansion of an existing chat. **Enabled** means the setting has been saved and the configuration correctly references it; actual adoption by a chat must be confirmed separately. This is a third-party tool, not an official product.
 
