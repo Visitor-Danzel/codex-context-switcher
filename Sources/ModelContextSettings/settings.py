@@ -140,7 +140,32 @@ def _selection(data,official):
     return selected
 
 
-def _current(paths,config,official):
+def _historical_selection(data,history):
+    """Recognize only reviewed old row identities, never a self-consistent forgery."""
+    if type(data) is not dict or type(data.get('models')) is not list or type(history) is not list:
+        raise Refused('damaged_catalog')
+    encode=lambda value:json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()
+    metadata=digest(encode({k:v for k,v in data.items() if k!='models'}))
+    for baseline in history[:32]:
+        if type(baseline) is not dict or baseline.get('metadata_sha256')!=metadata:continue
+        expected=baseline.get('models');rows=data['models']
+        if type(expected) is not list or not 0<len(expected)<=100 or len(rows)!=len(expected):continue
+        selected=[];valid=True;seen=set()
+        for row,prior in zip(rows,expected):
+            if type(row) is not dict or type(prior) is not dict:valid=False;break
+            slug=row.get('slug');value=row.get('context_window');normal=prior.get('default');maximum=prior.get('maximum')
+            if type(slug) is not str or slug in seen or slug!=prior.get('slug') or not valid_window(normal) or not valid_window(maximum) or normal>maximum:
+                valid=False;break
+            seen.add(slug)
+            identity=digest(encode({k:v for k,v in row.items() if k!='context_window'}))
+            if identity!=prior.get('identity_sha256') or type(value) is not int or value not in (normal,maximum):
+                valid=False;break
+            if value>normal:selected.append(slug)
+        if valid:return selected
+    raise Refused('damaged_catalog')
+
+
+def _current(paths,config,official,history=()):
     data=parse(config['raw']);value=data.get(KEY)
     if value is None:return 'default',[],None
     if type(value) is not str:return 'other_catalog',[],None
@@ -149,7 +174,11 @@ def _current(paths,config,official):
     try:
         snapshot=read_snapshot(value)
         if owned and digest(snapshot['raw'])+'.json'!=Path(value).name:raise Refused('damaged_catalog')
-        selected=_selection(json_data(snapshot['raw']),official)
+        data=json_data(snapshot['raw'])
+        try:selected=_selection(data,official)
+        except Refused:
+            if not owned:raise
+            return 'catalog_outdated',_historical_selection(data,history),snapshot
         return ('configured' if owned else 'legacy_configured'),selected,snapshot
     except Refused:return ('damaged_catalog' if owned else 'legacy_stale'),[],None
 
@@ -168,7 +197,7 @@ def _journal_status(paths,config):
 def inspect(paths):
     config=read_snapshot(paths.config)
     official,record,compatible,_=sources(paths)
-    state,selected,_=_current(paths,config,official)
+    state,selected,_=_current(paths,config,official,record.get('catalog_history',[]))
     data=parse(config['raw']);conflict=any(k in data for k in ('model_context_window','model_auto_compact_token_limit','profile','profiles')) or data.get('model_provider','openai')!='openai'
     transaction_state,undo=_journal_status(paths,config)
     if read_snapshot(paths.config)['sha256']!=config['sha256']:raise Refused('source_changed')
@@ -223,14 +252,14 @@ def make_preview(paths,action,selection):
         candidate=_reverse(config['raw'],record);after=parse(candidate).get(KEY);selection=[];record_id=record['id']
     else:
         if type(selection) is not list or any(type(s) is not str for s in selection) or len(set(selection))!=len(selection):raise Refused('invalid_selection')
-        official,_,compatible,source_files=sources(paths)
+        official,declaration,compatible,source_files=sources(paths)
         if not compatible:raise Refused('runtime_changed')
         if any(k in data for k in ('model_context_window','model_auto_compact_token_limit','profile','profiles')) or data.get('model_provider','openai')!='openai':raise Refused('configuration_override')
-        state,_,current=_current(paths,config,official)
+        state,_,current=_current(paths,config,official,declaration.get('catalog_history',[]))
         if state in ('other_catalog','damaged_catalog'):raise Refused(state)
         # A stale legacy catalog can be explicitly replaced; the old file remains intact.
         allowed={r['slug'] for r in official['models'] if r['max_context_window']>r['context_window']}
-        if not set(selection)<=allowed:raise Refused('invalid_selection')
+        if action!='defaults' and not set(selection)<=allowed:raise Refused('invalid_selection')
         selection=sorted(selection)
         if action=='defaults':selection=[];after=None
         else:

@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "catalogs": [
+    {
+      "cli_version": "0.162.0-alpha.17.2",
+      "catalog_sha256": "69af12f94a39dabd1a1ded8f5257b4884d2118902ea2b5b9cffbf4a1925dfa65",
+      "metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "models": [
+        {
+          "slug": "gpt-6-astra",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "ed2dde2939ae69075eb0626197eb60d728a0aaa5b52cc8d7ae1ac0bf42d65d50"
+        },
+        {
+          "slug": "gpt-6.1-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "45d48165d1c9b26e7e80402c565e96433779c2d47e1b69909b0ede7a76175d01"
+        },
+        {
+          "slug": "gpt-6-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "7443d8475e9c8dbd943380e3c7510ce679f772fdfef29897fdfe9af4f073ce1f"
+        },
+        {
+          "slug": "gpt-6-luna",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "72fccd8838ada2699e9cfc89c92364a2163fde2f6ac6719952985ce3318876b0"
+        },
+        {
+          "slug": "gpt-5.6-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "d04cd2631e474c4f28f1e9622c6297621f7f8c59460c3f456ac269e64e96cdd2"
+        },
+        {
+          "slug": "gpt-5.6-terra",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "e69e878cd9fbc49650ab21645bfda85572ed4516c17bdc2b535eb4b7b0b74c92"
+        },
+        {
+          "slug": "gpt-5.6-luna",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "273054b5e124d3cd905bcae1eb74914ed161ae56a038b6bfe4d5919a41fb9a8d"
+        },
+        {
+          "slug": "gpt-daybreak-blue-latest",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "3735b9c62caf188851ff62fe94890efbd0f2a36f88dcba8099c4818d56fe3f03"
+        },
+        {
+          "slug": "gpt-daybreak-red-latest",
+          "default": 372000,
+          "maximum": 372000,
+          "identity_sha256": "25c681a3dd79da9a66b3dc835f4f489594daa188497ceedad5ae0a121396bfef"
+        },
+        {
+          "slug": "gpt-5.5",
+          "default": 272000,
+          "maximum": 272000,
+          "identity_sha256": "eee76f4377f90150482331e475088e95fb219a0eeddd65f13b1b64878712dddb"
+        },
+        {
+          "slug": "codex-auto-review",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "788c598cd607dffeb2c6b632e011a3194615af4ed7bb91f045e631f3372e4fed"
+        }
+      ]
+    },
+    {
+      "cli_version": "0.165.0-alpha.1.2",
+      "catalog_sha256": "9e01cd50ec8c4ba6d782413d1154cb2dbe1da63e014d622631b0603bc19659d6",
+      "metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "models": [
+        {
+          "slug": "gpt-6-astra",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "ed2dde2939ae69075eb0626197eb60d728a0aaa5b52cc8d7ae1ac0bf42d65d50"
+        },
+        {
+          "slug": "gpt-6.1-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "45d48165d1c9b26e7e80402c565e96433779c2d47e1b69909b0ede7a76175d01"
+        },
+        {
+          "slug": "gpt-6.1-terra",
+          "default": 500000,
+          "maximum": 872000,
+          "identity_sha256": "a33e3c37467b73898f299d49e9d9056be62fafa9bca2fad88584d8d0cd76a2cb"
+        },
+        {
+          "slug": "gpt-6-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "7443d8475e9c8dbd943380e3c7510ce679f772fdfef29897fdfe9af4f073ce1f"
+        },
+        {
+          "slug": "gpt-6-luna",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "72fccd8838ada2699e9cfc89c92364a2163fde2f6ac6719952985ce3318876b0"
+        },
+        {
+          "slug": "gpt-5.6-sol",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "d04cd2631e474c4f28f1e9622c6297621f7f8c59460c3f456ac269e64e96cdd2"
+        },
+        {
+          "slug": "gpt-5.6-terra",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "e69e878cd9fbc49650ab21645bfda85572ed4516c17bdc2b535eb4b7b0b74c92"
+        },
+        {
+          "slug": "gpt-5.6-luna",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "273054b5e124d3cd905bcae1eb74914ed161ae56a038b6bfe4d5919a41fb9a8d"
+        },
+        {
+          "slug": "gpt-daybreak-blue-latest",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "3735b9c62caf188851ff62fe94890efbd0f2a36f88dcba8099c4818d56fe3f03"
+        },
+        {
+          "slug": "gpt-daybreak-red-latest",
+          "default": 372000,
+          "maximum": 372000,
+          "identity_sha256": "25c681a3dd79da9a66b3dc835f4f489594daa188497ceedad5ae0a121396bfef"
+        },
+        {
+          "slug": "gpt-5.5",
+          "default": 272000,
+          "maximum": 272000,
+          "identity_sha256": "eee76f4377f90150482331e475088e95fb219a0eeddd65f13b1b64878712dddb"
+        },
+        {
+          "slug": "codex-auto-review",
+          "default": 272000,
+          "maximum": 872000,
+          "identity_sha256": "788c598cd607dffeb2c6b632e011a3194615af4ed7bb91f045e631f3372e4fed"
+        }
+      ]
+    }
+  ]
+}
