@@ -53,6 +53,7 @@ static NSDictionary *MaximumCall(NSDictionary *request) {
 
 static NSString *MaximumReason(NSString *reason) {
  NSDictionary *reasons=@{
+ @"catalog_route_paused":@"此方式会接管 Codex 原生模型列表，已暂停保存。请退出 Codex 后用“恢复默认”撤回本工具的清单覆盖。",
  @"codex_running_or_unknown":@"仍检测到 Codex／ChatGPT 或 Codex 命令行进程在运行。请退出后再保存；工具不会代你结束这些进程。",
  @"desktop_check_unavailable":@"工具未能查询进程列表，不能确认 Codex 是否退出。操作已停止，请刷新检查当前状态；这不表示你没有退出 Codex。",
  @"exclusive_edit_not_confirmed":@"请关闭配置编辑器，并确认保存期间没有其他程序修改配置。",
@@ -135,7 +136,7 @@ static NSString *MaximumReason(NSString *reason) {
 - (void)changeLanguage:(NSPopUpButton *)sender {
  MaximumEnglish=sender.indexOfSelectedItem==1;
  self.window.title=MaximumText(@"最大上下文");self.headingLabel.stringValue=self.window.title;
- self.subtitleLabel.stringValue=MaximumText(@"为每个模型分别选择；其他模型保留默认。");
+ self.subtitleLabel.stringValue=MaximumText([self.status[@"catalog_route_paused"] boolValue]?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择；其他模型保留默认。");
  self.saveButton.title=MaximumText(@"保存");self.defaultsButton.title=MaximumText(@"恢复默认");
  self.undoButton.title=MaximumText([self.status[@"transaction_state"] isEqual:@"uncertain"]?@"检查上次保存":@"撤销上次保存");
  self.refreshButton.title=MaximumText(@"刷新");self.quitItem.title=MaximumText(@"退出最大上下文");
@@ -153,19 +154,23 @@ static NSString *MaximumReason(NSString *reason) {
  BOOL compatible=[self.status[@"runtime_compatible"] boolValue];
  NSString *state=self.status[@"state"];BOOL safe=[@[@"configured",@"default",@"legacy_configured",@"legacy_stale",@"catalog_outdated"] containsObject:state];
  BOOL uncertain=[self.status[@"transaction_state"] isEqual:@"uncertain"];
+ BOOL paused=[self.status[@"catalog_route_paused"] boolValue];
+ self.subtitleLabel.stringValue=MaximumText(paused?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择；其他模型保留默认。");
  BOOL allowed=compatible&&safe&&![self.status[@"configuration_conflict"] boolValue]&&!uncertain&&!self.busy;
  BOOL dirty=self.status && ![self.selection isEqual:[NSSet setWithArray:self.status[@"selected"] ?: @[]]];
- self.saveButton.enabled=allowed&&(dirty||[state isEqual:@"legacy_stale"]||[state isEqual:@"catalog_outdated"]);
+ self.saveButton.enabled=allowed&&!paused&&(dirty||[state isEqual:@"legacy_stale"]||[state isEqual:@"catalog_outdated"]);
  self.defaultsButton.enabled=allowed&&![state isEqual:@"default"];
  self.undoButton.title=uncertain?MaximumText(@"检查上次保存"):MaximumText(@"撤销上次保存");
- self.undoButton.enabled=([self.status[@"undo_available"] boolValue]||uncertain)&&!self.busy;
+ self.undoButton.enabled=([self.status[@"undo_available"] boolValue]||uncertain)&&!self.busy&&(!paused||uncertain);
  self.refreshButton.enabled=!self.busy;
- for(NSButton *button in self.modelButtons)button.enabled=allowed&&[button.toolTip hasPrefix:MaximumText(@"可扩展")];
+ for(NSButton *button in self.modelButtons)button.enabled=allowed&&!paused&&[button.toolTip hasPrefix:MaximumText(@"可扩展")];
  if(self.busy)[self setSummary:@"正在处理，请稍候…"];
  else if(uncertain)[self setSummary:@"上次保存中断，需要检查。备份已保留；工具不会自动覆盖配置。"];
  else if(self.status && !compatible)[self setSummary:@"Codex 已更新：暂停新设置，保留状态读取和安全撤销。请更新工具。"];
  else if([self.status[@"configuration_conflict"] boolValue])[self setSummary:@"已有其他上下文设置或配置档，存在冲突；请先处理，工具不会擅自删除。"];
  else if([state isEqual:@"other_catalog"] || [state isEqual:@"damaged_catalog"])[self setSummary:MaximumReason(state)];
+ else if(paused && [state isEqual:@"default"])[self setSummary:@"当前使用 Codex 原生模型列表。逐模型上下文开关已暂停，尚无不接管清单的已验证方案。"];
+ else if(paused)[self setSummary:@"本工具的清单设置会接管原生模型列表，此方式已暂停。请退出 Codex 后点“恢复默认”撤回。"];
  else if(dirty)[self setSummaryFormat:@"有未保存的选择 · 准备让 %lu 个模型使用最大上下文" count:(unsigned long)self.selection.count];
  else if([state isEqual:@"catalog_outdated"])[self setSummary:@"模型清单需要更新，原有勾选已保留。点“保存”更新后重开 Codex，新增模型才会进入列表。"];
  else if([state isEqual:@"default"])[self setSummary:@"当前配置：默认上下文。勾选模型后点“保存”。"];
@@ -194,7 +199,7 @@ static NSString *MaximumReason(NSString *reason) {
  [self updateControls];
 }
 - (void)toggleModel:(NSButton *)sender {
- if(self.busy)return;
+ if(self.busy||[self.status[@"catalog_route_paused"] boolValue])return;
  if(sender.state==NSControlStateValueOn)[self.selection addObject:sender.identifier];else[self.selection removeObject:sender.identifier];
  [self updateControls];
 }
@@ -214,9 +219,12 @@ static NSString *MaximumReason(NSString *reason) {
   if(![reply[@"ok"] boolValue]){self.busy=NO;[self updateControls];[self showFailure:reply[@"error"]];return;}
   NSDictionary *preview=reply[@"result"];
   NSAlert *alert=[NSAlert new];alert.messageText=[action isEqual:@"recover"]?MaximumText(@"检查上次中断的保存？"):([action isEqual:@"undo"]?MaximumText(@"撤销上次保存？"):([action isEqual:@"defaults"]?MaximumText(@"恢复默认上下文？"):MaximumText(@"保存最大上下文选择？")));
+  BOOL withdraw=[self.status[@"catalog_route_paused"] boolValue]&&[action isEqual:@"defaults"];
+  if(withdraw)alert.messageText=MaximumText(@"撤回本工具的模型清单设置？");
   NSString *change=[action isEqual:@"save"]?[NSString stringWithFormat:MaximumText(@"以下 %lu 个模型使用最大上下文：\n%@\n其他模型使用默认值。"),(unsigned long)[preview[@"selected"] count],[preview[@"selected"] componentsJoinedByString:@"、"]]:([action isEqual:@"undo"]?MaximumText(@"将配置还原到上次保存之前。"):MaximumText(@"移除本工具的清单设置，恢复 Codex 内置默认值。"));
   alert.informativeText=[action isEqual:@"recover"]?MaximumText(@"对照备份确认上次保存是否完成。只更新本工具的记录，不改 Codex 配置；如果配置被其他程序改动，将停止检查。请先完全退出 Codex，并关闭配置编辑器。"):[change stringByAppendingString:MaximumText(@"\n\n只修改 config.toml 的模型清单路径。先完全退出 Codex；保存后重新打开 Codex，在新聊天中使用。原始配置备份会保留。")];
-  [alert addButtonWithTitle:MaximumText(@"确认保存")];[alert addButtonWithTitle:MaximumText(@"取消")];
+  if(withdraw)alert.informativeText=MaximumText(@"只移除本工具写入的 model_catalog_json，恢复 Codex 原生模型发现；同时撤回本工具提供的最大上下文设置。其他配置不变，备份保留。\n\n请先完全退出 Codex 和官方 CLI，关闭配置编辑器；确认后重新打开 Codex。");
+  [alert addButtonWithTitle:MaximumText(withdraw?@"确认恢复默认":@"确认保存")];[alert addButtonWithTitle:MaximumText(@"取消")];
   NSView *accessory=[[NSView alloc] initWithFrame:NSMakeRect(0,0,440,64)];
   NSButton *closed=[NSButton checkboxWithTitle:MaximumText(@"我已完全退出 Codex") target:nil action:nil];closed.frame=NSMakeRect(0,36,430,24);
   NSButton *exclusive=[NSButton checkboxWithTitle:MaximumText(@"配置编辑器已关闭，保存时没有其他程序改配置") target:nil action:nil];exclusive.frame=NSMakeRect(0,6,440,24);[accessory addSubview:closed];[accessory addSubview:exclusive];alert.accessoryView=accessory;
@@ -225,7 +233,7 @@ static NSString *MaximumReason(NSString *reason) {
   if(closed.state!=NSControlStateValueOn||exclusive.state!=NSControlStateValueOn){self.busy=NO;[self updateControls];[self showFailure:@"exclusive_edit_not_confirmed"];return;}
   NSDictionary *request=@{@"operation":@"apply",@"preview":preview,@"confirmation":preview[@"confirmation"],@"exclusive_edit":@YES};
   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{NSDictionary *saved=MaximumCall(request);dispatch_async(dispatch_get_main_queue(),^{self.busy=NO;
-    if([saved[@"ok"] boolValue]){[self acceptStatus:saved[@"result"]];[self setSummary:[action isEqual:@"undo"]?@"已撤销。重新打开 Codex 后加载恢复的配置。":@"已保存。重新打开 Codex，在新聊天中使用。"];}
+    if([saved[@"ok"] boolValue]){[self acceptStatus:saved[@"result"]];[self setSummary:withdraw?@"已撤回本工具的清单覆盖。请重开 Codex，恢复原生模型发现。":([action isEqual:@"recover"]?@"记录已检查，原生配置没有修改。":([action isEqual:@"undo"]?@"已撤销。重新打开 Codex 后加载恢复的配置。":@"已保存。重新打开 Codex，在新聊天中使用。"))];}
     else {[self updateControls];[self showFailure:saved[@"error"]];[self refresh:nil];}
   });});
  });});

@@ -7,6 +7,15 @@ static NSString *MaximumText(NSString *chinese) {
  static dispatch_once_t once;
  dispatch_once(&once, ^{
   translations=@{
+   @"清单方式已暂停；仅可检查状态或恢复默认。":@"Catalog mode is paused; only status checks and Defaults remain available.",
+   @"当前使用 Codex 原生模型列表。逐模型上下文开关已暂停，尚无不接管清单的已验证方案。":@"Codex uses native model discovery. Per-model context switching is paused; a list-preserving replacement is not yet verified.",
+   @"本工具的清单设置会接管原生模型列表，此方式已暂停。请退出 Codex 后点“恢复默认”撤回。":@"This tool's catalog overrides the native model list. This route is paused. Quit Codex, then use Defaults to withdraw it.",
+   @"此方式会接管 Codex 原生模型列表，已暂停保存。请退出 Codex 后用“恢复默认”撤回本工具的清单覆盖。":@"Saving is paused because this route overrides Codex's native model list. Quit Codex and use Defaults to remove this tool's override.",
+   @"撤回本工具的模型清单设置？":@"Withdraw this tool's model catalog setting?",
+   @"只移除本工具写入的 model_catalog_json，恢复 Codex 原生模型发现；同时撤回本工具提供的最大上下文设置。其他配置不变，备份保留。\n\n请先完全退出 Codex 和官方 CLI，关闭配置编辑器；确认后重新打开 Codex。":@"Remove only this tool's model_catalog_json override to restore native Codex model discovery. This also removes the maximum-context settings supplied by this tool. Other configuration is unchanged and backups are preserved.\n\nFully quit Codex and the official CLI, close config editors, then confirm and reopen Codex.",
+   @"确认恢复默认":@"Confirm Defaults",
+   @"已撤回本工具的清单覆盖。请重开 Codex，恢复原生模型发现。":@"The catalog override was removed. Reopen Codex to resume native model discovery.",
+   @"记录已检查，原生配置没有修改。":@"The record was checked; the native configuration was not changed.",
    @"最大上下文":@"Maximum Context",
    @"为每个模型分别选择；其他模型保留默认。":@"Choose models individually; others keep their defaults.",
    @"正在读取设置…":@"Reading settings…",
