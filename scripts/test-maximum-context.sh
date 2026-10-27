@@ -17,7 +17,7 @@ done
 PYTHONDONTWRITEBYTECODE=1 python3 - <<'PYTEST'
 import sys, unittest
 sys.path.insert(0,'Tests')
-names=['test_model_context_settings','test_model_context_worker',
+names=['test_model_context_settings','test_model_context_migration','test_model_context_worker',
        'test_context_settings_config','test_context_settings_preview',
        'test_context_settings_transaction','test_context_settings_restart',
        'test_maximum_context_package','test_maximum_context_guard','test_legacy_repair_integration']

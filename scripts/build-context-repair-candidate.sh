@@ -29,6 +29,9 @@ if native_hash!=(stage/'native-before.sha256').read_text():raise SystemExit('CLI
 catalog=stage/'current-models.json';data=json.loads(catalog.read_text())
 if len({m['slug'] for m in data['models']})!=len(data['models']):raise SystemExit('duplicate models')
 record={'cli_version':version,'native_sha256':native_hash,'catalog_sha256':hashlib.sha256(catalog.read_bytes()).hexdigest(),'model_count':len(data['models']),'real_switch_completed':False}
+history=json.loads((project/'Sources/ModelContextSettings/catalog_history.json').read_text())
+if history.get('schema')!=1 or type(history.get('catalogs')) is not list:raise SystemExit('Invalid catalog history')
+record['catalog_history']=history['catalogs']
 app=stage/'Codex Context Switcher.app';mac=app/'Contents/MacOS';res=app/'Contents/Resources';mac.mkdir(parents=True);res.mkdir()
 shutil.copy2(stage/'CodexContextSwitcher',mac/'CodexContextSwitcher');shutil.copy2(catalog,res/'current-models.json');shutil.copy2(project/'Sources/CodexContextSwitcherApp/legacy_context_readout.py',res/'legacy_context_readout.py')
 for package,names in {'ContextSettings':['__init__.py','config_file.py','attributes.py','preview.py','transaction.py','worker.py'],
@@ -38,10 +41,11 @@ for package,names in {'ContextSettings':['__init__.py','config_file.py','attribu
 (res/'catalog-record.json').write_text(json.dumps(record,indent=2)+'\n')
 shutil.copy2(project/'AppIcon.icns',res/'AppIcon.icns')
 shutil.copy2(project/'LICENSE',res/'LICENSE')
-plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.3','CFBundleVersion':'11','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
+plist={'CFBundleExecutable':'CodexContextSwitcher','CFBundleIdentifier':'com.brucestudio.codex-context-switcher.repair-candidate','CFBundleName':'Codex Context Switcher','CFBundlePackageType':'APPL','CFBundleShortVersionString':'2.2.4','CFBundleVersion':'12','LSUIElement':False,'NSHighResolutionCapable':True,'LSMinimumSystemVersion':'13.0'}
 plist['CFBundleIconFile']='AppIcon.icns'
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(plist))
 source_paths=[project/'Sources/CodexContextSwitcherApp'/name for name in ['main.m','RepairCandidate.h','MaximumContext.h','MaximumLanguage.h','ContextRepairSession.h','ContextRepairSession.m','legacy_context_readout.py']]
+source_paths += [project/'Sources/ModelContextSettings/catalog_history.json']
 source_paths += [project/'Sources/CodexContextCore'/name for name in ['CodexContextCore.h','CodexContextCore.m']]
 source_paths += [p for package in ['ContextSettings','ModelContextSettings'] for p in sorted((project/'Sources'/package).glob('*.py'))]
 record['source_sha256']={str(p.relative_to(project)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
