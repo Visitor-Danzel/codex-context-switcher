@@ -1,8 +1,10 @@
+> **Correction: 2.2.5 / 13 is a containment/withdrawal release. Independent per-model control with unchanged native discovery remains unfinished. The historical technical results below do not establish that requirement.**
+
 # Maximum-context acceptance summary
 
 [中文](ACCEPTANCE.md) | English
 
-Current version: **2.2.4 / 12**. Supported bundled CLI: **0.165.0-alpha.1.2**. The real-configuration and native-chat acceptance below was performed with version 2.2.1 / 9. Its configuration-processing and protection code is unchanged in this translation update.
+Current version: **2.2.5 / 13**, containment and withdrawal only. The real-configuration and capacity observations below were made with historical version 2.2.1 / 9; they do not establish unchanged native discovery. Historical sections retain their original scope; the correction governs the current recommendation. Current bundled CLI verification: **0.165.0-alpha.1.2**.
 
 | Item | Result and evidence |
 | --- | --- |
@@ -15,7 +17,7 @@ Current version: **2.2.4 / 12**. Supported bundled CLI: **0.165.0-alpha.1.2**. T
 | Native model list | After saving and restarting Codex, the user reported that the model list looked unchanged; accepted on the basis of that actual observation |
 | Original public source archive | Independent extraction and build succeeded; 68 explicit tests plus 34 runtime, isolation, and UI checks passed with zero failures and zero skips; strict signature and file digests passed |
 
-The required maximum-context acceptance was completed. Native interface observations were supplied by the user. Public source excludes private records, configurations, and screenshots. The observed 828k confirms adoption of the expanded window by that new Astra chat; it is not a stress test of full-capacity server input and does not promise compatibility with future Codex versions.
+The earlier complete-product acceptance claim is withdrawn; only the historical technical observations below are retained. Native interface observations were supplied by the user. Public source excludes private records, configurations, and screenshots. The observed 828k confirms adoption of the expanded window by that new Astra chat; it is not a stress test of full-capacity server input and does not promise compatibility with future Codex versions.
 
 ## Chinese/English display update
 
@@ -40,3 +42,9 @@ After the user reported a desktop update, local checks found the same bundled CL
 Supports bundled CLI 0.165.0-alpha.1.2 and its complete 12-model catalog. Reviewed historical identity fingerprints are included without distributing the original generated catalogs. Recognized upgrades preserve selections; unknown or altered catalogs remain blocked. New-model settings, migration, Defaults, Undo, external-change protections, and both UI languages are verified using isolated fixtures. Two fixed-count assertions now compare complete model identities. The native application is unchanged and real settings are not switched automatically. The native model list and chat capacity require user-confirmed saving and a Codex restart; isolated results are not real-configuration acceptance.
 
 The final public source was independently built: all 79 tests, 14 runtime checks, 7 isolation checks, and 53 actual AppKit UI checks passed, for 153 total, with zero failures or skips; strict signature verification passed. Additional packaged end-to-end checks passed for the real old 11-model snapshot migrating to the current 12-model snapshot, preserved Sol selection, all new official fields, exact Undo, Defaults and Undo, and independent Terra selection. The current official CLI loaded both saved isolated catalogs. The Defaults edge found by independent review was fixed and regression-tested; follow-up review found no remaining blockers.
+
+## Scope correction in 2.2.5 / 13
+
+Production policy refuses catalog creation, save, and Undo reinstatement. Explicit Defaults withdrawal and journal-only checks remain. Withdrawal also removes this tool’s maximum-context settings while retaining unrelated configuration. Exit, exclusive-edit, preview and external-change gates remain unchanged. Historical fixture mode is not a production capability. Native discovery restoration still requires user-confirmed withdrawal and a client restart.
+
+The corrective public source was independently built: 85 tests, 14 runtime checks, 7 isolation checks and 58 actual AppKit UI checks passed, 164 total, with zero failures or skips and strict signature verification. This verifies containment/withdrawal protections and historical isolated regression behavior, not completion of the full per-model goal. The withdrawal confirmation was inspected and cancelled; real configuration remains unchanged and native discovery restoration is not accepted yet. Independent static review found no write bypass or unsafe withdrawal.
