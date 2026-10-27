@@ -24,6 +24,7 @@ static NSString *MaximumText(NSString *chinese) {
    @"有未保存的选择 · 准备让 %lu 个模型使用最大上下文":@"Unsaved selections · Maximum-context models selected: %lu",
    @"当前配置：默认上下文。勾选模型后点“保存”。":@"Current configuration: default context. Select models, then click Save.",
    @"当前配置仍引用旧清单。点“保存”可换为当前完整清单，旧文件会保留。":@"The configuration still refers to an older catalog. Click Save to use the current full catalog; older files will be preserved.",
+   @"模型清单需要更新，原有勾选已保留。点“保存”更新后重开 Codex，新增模型才会进入列表。":@"The model catalog needs updating; your selections are preserved. Save and restart Codex to load newly added models.",
    @"当前配置：已启用 · %lu 个模型使用最大上下文":@"Current configuration: enabled · Maximum-context models: %lu",
    @"默认 %@ → 最大 %@ tokens%@":@"Default %@ → Maximum %@ tokens%@",
    @" · 内部模型":@" · Internal model",

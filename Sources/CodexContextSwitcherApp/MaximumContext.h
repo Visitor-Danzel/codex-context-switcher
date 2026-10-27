@@ -151,11 +151,11 @@ static NSString *MaximumReason(NSString *reason) {
 }
 - (void)updateControls {
  BOOL compatible=[self.status[@"runtime_compatible"] boolValue];
- NSString *state=self.status[@"state"];BOOL safe=[@[@"configured",@"default",@"legacy_configured",@"legacy_stale"] containsObject:state];
+ NSString *state=self.status[@"state"];BOOL safe=[@[@"configured",@"default",@"legacy_configured",@"legacy_stale",@"catalog_outdated"] containsObject:state];
  BOOL uncertain=[self.status[@"transaction_state"] isEqual:@"uncertain"];
  BOOL allowed=compatible&&safe&&![self.status[@"configuration_conflict"] boolValue]&&!uncertain&&!self.busy;
  BOOL dirty=self.status && ![self.selection isEqual:[NSSet setWithArray:self.status[@"selected"] ?: @[]]];
- self.saveButton.enabled=allowed&&(dirty||[state isEqual:@"legacy_stale"]);
+ self.saveButton.enabled=allowed&&(dirty||[state isEqual:@"legacy_stale"]||[state isEqual:@"catalog_outdated"]);
  self.defaultsButton.enabled=allowed&&![state isEqual:@"default"];
  self.undoButton.title=uncertain?MaximumText(@"检查上次保存"):MaximumText(@"撤销上次保存");
  self.undoButton.enabled=([self.status[@"undo_available"] boolValue]||uncertain)&&!self.busy;
@@ -167,6 +167,7 @@ static NSString *MaximumReason(NSString *reason) {
  else if([self.status[@"configuration_conflict"] boolValue])[self setSummary:@"已有其他上下文设置或配置档，存在冲突；请先处理，工具不会擅自删除。"];
  else if([state isEqual:@"other_catalog"] || [state isEqual:@"damaged_catalog"])[self setSummary:MaximumReason(state)];
  else if(dirty)[self setSummaryFormat:@"有未保存的选择 · 准备让 %lu 个模型使用最大上下文" count:(unsigned long)self.selection.count];
+ else if([state isEqual:@"catalog_outdated"])[self setSummary:@"模型清单需要更新，原有勾选已保留。点“保存”更新后重开 Codex，新增模型才会进入列表。"];
  else if([state isEqual:@"default"])[self setSummary:@"当前配置：默认上下文。勾选模型后点“保存”。"];
  else if([state isEqual:@"legacy_stale"])[self setSummary:@"当前配置仍引用旧清单。点“保存”可换为当前完整清单，旧文件会保留。"];
  else if(self.status)[self setSummaryFormat:@"当前配置：已启用 · %lu 个模型使用最大上下文" count:(unsigned long)self.selection.count];
