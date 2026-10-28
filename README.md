@@ -44,7 +44,7 @@ open "build/legacy-context-repair-candidate/Codex Context Switcher.app"
 sh scripts/test-maximum-context.sh
 ```
 
-测试仅使用指定隔离资料，详见 [验收范围](ACCEPTANCE.md)。当前发布代码恢复了真实保存入口；本轮未自动修改作者真实设置。历史 Astra 原生窗口曾显示 828k；它不能冒充 2.3.0 在当前客户端的完整原生验收，也不是所有模型的满窗口压力测试。
+自动化测试使用指定隔离资料，详见 [验收范围](ACCEPTANCE.md)。2.3.0 已完成一轮真实使用验收：用户退出 Codex、保存选择并重开后，GPT‑6.1 Sol 与 GPT‑6 Luna 的原生上下文圆环均显示 828k，GPT‑6.1 Terra 已出现在模型列表中。只读回查确认两个模型均配置为 872000，保存记录一致；当前随附模型资料采用 95% 可用比例，872000 × 95% = 828400，与 828k 显示一致。配置由用户主动保存，验证过程未再次改写。该结果覆盖这次已选模型，不是所有模型的服务器满窗口压力测试或未来版本兼容保证。
 
 <img src="AppIcon.png" width="128" height="128" alt="应用图标">
 

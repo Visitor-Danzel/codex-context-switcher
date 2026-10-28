@@ -44,7 +44,7 @@ Quitting the tool does not withdraw settings automatically. Defaults, Undo, rege
 sh scripts/test-maximum-context.sh
 ```
 
-Tests use explicit isolated fixtures; see [acceptance scope](ACCEPTANCE.en.md). Production saving is restored, but this development run did not automatically change the author's real settings. A historical Astra native chat showed 828k; that is not full native acceptance of version 2.3.0 on the current client, or a full-window stress test for every model.
+Automated tests use explicit isolated fixtures; see [acceptance scope](ACCEPTANCE.en.md). Version 2.3.0 has now passed one real-use acceptance round: after the user quit Codex, saved the selections, and reopened it, both GPT‑6.1 Sol and GPT‑6 Luna showed 828k in the native context indicator, and GPT‑6.1 Terra appeared in the model list. Read-only verification confirmed 872000 configured for both models and a consistent saved transaction. Their current bundled metadata uses a 95% effective-context ratio: 872000 × 95% = 828400, consistent with the 828k display. The user performed the save; verification did not rewrite settings. These observations cover the selected models, not full-window server stress testing of every model or guaranteed compatibility with future versions.
 
 <img src="AppIcon.png" width="128" height="128" alt="App icon">
 
