@@ -111,6 +111,15 @@ class CatalogMigrationTests(unittest.TestCase):
         self.assertEqual(self.module.inspect(self.paths)['selected'],['a'])
         with self.assertRaisesRegex(self.module.Refused,'invalid_selection'):self.save(['a'])
 
+    def test_migration_preview_names_obsolete_choices_before_clearing_them(self):
+        self.save(['a']);self.upgrade();self.rows['models']=self.rows['models'][1:]
+        self.official.write_text(json.dumps(self.rows));record=json.loads(self.record.read_text())
+        record['catalog_sha256']=hashlib.sha256(self.official.read_bytes()).hexdigest();self.record.write_text(json.dumps(record))
+        preview=self.module.make_preview(self.paths,'save',[])
+        self.assertEqual(preview['omitted_selected'],['a'])
+        self.module.apply(self.paths,preview,preview['confirmation'],self.gate)
+        self.assertEqual(self.module.inspect(self.paths)['selected'],[])
+
     def test_gui_defaults_clears_a_removed_preserved_selection(self):
         self.save(['a']);self.upgrade();self.rows['models']=self.rows['models'][1:]
         self.official.write_text(json.dumps(self.rows));record=json.loads(self.record.read_text())
