@@ -2,45 +2,54 @@
 
 [中文](README.md) | English
 
-## Important correction: catalog mode is paused
+**2.3.0 / 14 restores independent per-model maximum-context controls in catalog mode.** Startup only reads settings. Configuration changes require Save and explicit confirmation. Chinese / English and the app icon are preserved.
 
-Version **2.2.5 / 13** is a containment and withdrawal release. **It is not a completed per-model maximum-context switcher that leaves native model discovery unchanged.**
+## Understand catalog mode first
 
-Earlier versions used `model_catalog_json` for per-model context values. That setting also controls the native Codex model list and prevents normal online discovery. An old snapshot can omit newly released models. "The native application files are unchanged" did not establish "the native model list is unaffected." Refreshing the snapshot in 2.2.4 did not remove this fundamental side effect. The earlier completion/recommendation claim is withdrawn.
+This tool uses the official `model_catalog_json` configuration. It supplies per-model context capacities **and makes Codex use this tool's catalog instead of native online model discovery**. That tradeoff is explicit in this release. The earlier claim that the native model list was unaffected remains withdrawn.
 
-**Saving catalogs and using Undo to reinstall them are disabled for real configurations. Do not use earlier releases to enable or refresh the override.** Read-only status, explicitly confirmed Defaults withdrawal, and journal-only interrupted-record checks remain available. Historical functionality remains only in strictly disposable fixture mode for regression testing, not as a production feature promise.
+At build time, the tool obtains the installed official CLI's complete bundled catalog using `debug models --bundled`. It preserves model order and all metadata, changing only selected models' `context_window`. Bundled inventory is not a live account-availability list: listing Terra or another model does not grant access. Models already at their maximum display “Already maximum” without a redundant switch.
 
-## Restore native model discovery first
+**New models are not discovered automatically.** After a Codex client update, the tool blocks new saves using the old runtime identity. Rerun the build script to obtain the updated client's bundled catalog, then explicitly save the upgrade. A server-only model release may still be missing even if your client version has not changed. This release cannot discover or guarantee all server-side additions. Use Defaults when native live model discovery is needed.
 
-1. Build with `sh scripts/build-context-repair-candidate.sh`, then run `open "build/legacy-context-repair-candidate/Codex Context Switcher.app"`.
-2. Fully quit Codex and the official CLI, and close configuration editors.
-3. Click Defaults and explicitly confirm the withdrawal notice. It removes only the recognized `model_catalog_json` override written by this tool. **It also withdraws the maximum-context settings supplied by this tool.** Other configuration is preserved; backups and external-change checks remain.
-4. Reopen Codex and inspect its native model picker. The official Terra entry is under Advanced; account and workspace access still determine availability.
+## Build and use
 
-Do not keep clicking Save in an old release to refresh the list, delete native chats/databases, or modify or re-sign Codex. Exiting this tool or installing a newer build does not automatically change real configuration; explicit withdrawal is required. Unknown/damaged catalogs, conflicts, and interrupted transactions stop safely rather than bypass checks.
+Requires macOS 13+, Xcode Command Line Tools, and Python 3.11+. Tested on macOS arm64 with official bundled CLI 0.165.0-alpha.1.2 at `/Applications/ChatGPT.app`.
 
-## The goal remains unfinished
+```sh
+sh scripts/build-context-repair-candidate.sh
+open "build/legacy-context-repair-candidate/Codex Context Switcher.app"
+```
 
-The goal is independent maximum-context control for GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT-6.1 Terra, and other models while leaving the native model list and other behavior unchanged. **No replacement satisfying that complete constraint has been verified.** A shared limit will not be represented as per-model control, nor a replacement catalog as a context-only edit.
+1. Select maximum context for each desired model. Others keep bundled defaults.
+2. Fully quit the Codex / ChatGPT desktop app and official CLI, and close configuration editors.
+3. Click Save, read the scope disclosure, and confirm the exit and exclusive-edit conditions.
+4. Reopen Codex, use a new chat, and check actual capacity in the native context indicator.
 
-The official `model_context_window` setting directly controls capacity, but this project has not verified an official path for independent persistent per-model control without taking over discovery. That must be established before production writes are enabled.
+This release does not guarantee that the next prompt reloads capacity in an existing chat; restart plus a new chat is the verification path. Restarting the switcher rereads actual configuration rather than guessing from previous UI state. Saved configuration and actual chat adoption are distinguished; the tool does not inspect chats to confirm adoption.
 
-## Interface, build, and protections
+Defaults removes this tool's catalog override **and its capacity settings**, returning model discovery to Codex. Undo restores the previous configuration and may restore an older catalog; it stops if that catalog is modified or missing. Upgrades preserve still-expandable choices. Removed or no-longer-expandable previous choices are disclosed in the window and confirmation before they are omitted.
 
-Chinese and English are available at the top right; Chinese is the default. Language changes only relabel the interface. The icon is included in normal builds.
+## Transaction protection and limits
 
-<img src="AppIcon.png" width="128" height="128" alt="Application icon">
+Only the root `model_catalog_json` entry in the user's `~/.codex/config.toml` is edited. Generated catalogs and private transaction backups live under `~/Library/Application Support/CodexContextSwitcher`. Other configuration bytes are preserved. The tool does not modify or re-sign the native app, or handle chat databases, authentication files, keychains, routing, quotas, or personal controls. The configuration worker is denied network access.
 
-Tested on macOS arm64 with bundled CLI `0.165.0-alpha.1.2` under `/Applications/ChatGPT.app`. Xcode Command Line Tools and Python 3.11 or later are required. The build does not modify native application files or read chat databases, authentication files, or keychains. Configuration workers cannot use the network. Path identity, preview confirmation, external-change, process-exit, and exclusive-edit protections remain. No automatic overwrite or rollback is performed; backups are retained.
+Saving requires closed processes, a fresh confirmation, unchanged runtime/source identities, and no detected external configuration edits. Private backups are preserved. Interrupted operations are checked without automatic rollback or overwriting. Unsafe paths, unknown third-party catalogs, and conflicting capacity configuration stop the operation. Avoid concurrent editing during Save: the tool cannot lock out every external editor.
 
-Build first, then run `sh scripts/test-maximum-context.sh`. Only explicitly listed isolated fixtures are used. Technical tests do not prove that the native-list requirement is satisfied or that real withdrawal has occurred. See [ACCEPTANCE.en.md](ACCEPTANCE.en.md) for historical evidence and the correction. Public source excludes real configurations, chats, original generated model catalogs, private acceptance records, and unrelated modules.
+Quitting the tool does not withdraw settings automatically. Defaults, Undo, regeneration, and real-configuration saves always require explicit action.
 
-## Official references
+## Verification
 
-- [Catalogs control model discovery and take precedence over remote fetching](https://learn.chatgpt.com/docs/model-catalogs)
-- [Official context configuration](https://learn.chatgpt.com/docs/config-file/config-reference)
-- [Terra announcement and picker location](https://learn.chatgpt.com/docs/whats-new/october-26-30-2026)
+```sh
+sh scripts/test-maximum-context.sh
+```
 
-## License
+Tests use explicit isolated fixtures; see [acceptance scope](ACCEPTANCE.en.md). Production saving is restored, but this development run did not automatically change the author's real settings. A historical Astra native chat showed 828k; that is not full native acceptance of version 2.3.0 on the current client, or a full-window stress test for every model.
 
-[MIT License](LICENSE). Use, modification, redistribution, and commercial use are permitted with preservation of the copyright and license notices. The software is provided as is. Routing, quota features, and other product work are outside this release.
+<img src="AppIcon.png" width="128" height="128" alt="App icon">
+
+## Official references and license
+
+[Model catalogs](https://learn.chatgpt.com/docs/model-catalogs) · [Capacity configuration](https://learn.chatgpt.com/docs/config-file/config-reference)
+
+[MIT License](LICENSE). Use, modification, distribution, and commercial use are permitted with the copyright and license notice retained. Routing, quota features, and other product modules are outside this release.
