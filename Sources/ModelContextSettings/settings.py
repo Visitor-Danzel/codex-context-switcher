@@ -204,6 +204,7 @@ def inspect(paths):
     return {'schema':1,'state':state,'selected':selected,'runtime_compatible':compatible,
             'configuration_conflict':conflict,'undo_available':undo,'transaction_state':transaction_state,
             'cli_version':record.get('cli_version'),'session_verified':False,
+            'catalog_scope':'bundled_cli_snapshot','catalog_model_count':len(official['models']),
             'models':[{'slug':m['slug'],'name':m.get('display_name',m['slug']),
                        'default':m['context_window'],'maximum':m['max_context_window'],
                        'can_extend':m['max_context_window']>m['context_window'],
@@ -228,7 +229,7 @@ def _reverse(raw,record):
 def make_preview(paths,action,selection):
     if action not in ('save','defaults','undo','recover'):raise Refused('unknown_action')
     config=read_snapshot(paths.config,attributes=True);data=parse(config['raw'])
-    fingerprints={'config':public_snapshot(config)};record_id=None;catalog_raw=None
+    fingerprints={'config':public_snapshot(config)};record_id=None;catalog_raw=None;omitted=[]
     if action=='recover':
         record=_load(_private_root(paths.journal))
         if not record or record['phase']!='prepared':raise Refused('recovery_unavailable')
@@ -250,16 +251,23 @@ def make_preview(paths,action,selection):
         if not record or record['phase']!='saved':raise Refused('undo_unavailable')
         if record.get('target')!=config['path']:raise Refused('journal_target_mismatch')
         candidate=_reverse(config['raw'],record);after=parse(candidate).get(KEY);selection=[];record_id=record['id']
+        if after is not None:
+            official,_,_,source_files=sources(paths)
+            state,_,restored=_current(paths,{'raw':candidate},official,json_data(read_snapshot(paths.record)['raw']).get('catalog_history',[]))
+            if state not in ('configured','legacy_configured','catalog_outdated') or restored is None:
+                raise Refused('undo_catalog_unverified')
+            fingerprints.update(source_files);fingerprints['undo_catalog']=public_snapshot(restored)
     else:
         if type(selection) is not list or any(type(s) is not str for s in selection) or len(set(selection))!=len(selection):raise Refused('invalid_selection')
         official,declaration,compatible,source_files=sources(paths)
         if not compatible:raise Refused('runtime_changed')
         if any(k in data for k in ('model_context_window','model_auto_compact_token_limit','profile','profiles')) or data.get('model_provider','openai')!='openai':raise Refused('configuration_override')
-        state,_,current=_current(paths,config,official,declaration.get('catalog_history',[]))
+        state,previous,current=_current(paths,config,official,declaration.get('catalog_history',[]))
         if state in ('other_catalog','damaged_catalog'):raise Refused(state)
         # A stale legacy catalog can be explicitly replaced; the old file remains intact.
         allowed={r['slug'] for r in official['models'] if r['max_context_window']>r['context_window']}
         if action!='defaults' and not set(selection)<=allowed:raise Refused('invalid_selection')
+        omitted=sorted(set(previous)-allowed) if action=='save' else []
         selection=sorted(selection)
         if action=='defaults':selection=[];after=None
         else:
@@ -281,6 +289,9 @@ def make_preview(paths,action,selection):
              'selected':selection,'candidate_sha256':digest(candidate),'catalog_sha256':digest(catalog_raw) if catalog_raw else None,
              'sources':fingerprints,'record_id':record_id,'issued_at':now,'expires_at':now+TTL,
              'session_verified':False}
+    preview['omitted_selected']=omitted
+    preview['catalog_scope']='bundled_cli_snapshot' if after is not None else 'native_discovery'
+    preview['catalog_model_count']=len(official['models']) if action=='save' else None
     preview['confirmation']=confirmation(preview)
     return preview
 
@@ -308,7 +319,7 @@ def apply(paths,preview,token,gate):
         active=_load(root)
         if active and active['phase']=='prepared' and preview['action']!='recover':raise Refused('uncertain_previous_transaction')
         fresh=make_preview(paths,preview['action'],preview.get('selected'))
-        for key in ('action','target','before','after','selected','candidate_sha256','catalog_sha256','sources','record_id'):
+        for key in ('action','target','before','after','selected','candidate_sha256','catalog_sha256','sources','record_id','omitted_selected','catalog_scope','catalog_model_count'):
             if fresh.get(key)!=preview.get(key):raise Refused('preview_changed')
         snapshot=read_snapshot(paths.config,attributes=True)
         if preview['action']=='recover':

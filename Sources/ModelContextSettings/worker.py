@@ -66,10 +66,6 @@ def respond(paths,request,isolated=False):
                 'apply':{'operation','preview','confirmation','exclusive_edit'}}
         op=request.get('operation')
         if op not in fields or set(request)!=fields[op]:raise Refused('invalid_request')
-        # A catalog override owns the native model list, exceeding this tool's scope.
-        # Retain fixture-only historical verification and explicit removal/recovery.
-        if not isolated and op=='preview' and request.get('action')=='save':
-            raise Refused('catalog_route_paused')
         # Disposable configuration is not used by any native desktop process.
         check='isolated' if isolated else desktop_state()
         closed=isolated or check=='closed'
@@ -81,27 +77,23 @@ def respond(paths,request,isolated=False):
         if op=='inspect':result=settings.inspect(paths)
         elif op=='preview':
             result=settings.make_preview(paths,request['action'],request['selected'])
-            if not isolated and result.get('action')!='recover' and result.get('after') is not None:
-                raise Refused('catalog_route_paused')
         else:
             preview=request['preview']
             if type(preview) is not dict or preview.get('target')!=str(paths.config):raise Refused('request_target_mismatch')
-            if not isolated and (preview.get('action')=='save' or
-                    (preview.get('action')!='recover' and preview.get('after') is not None)):
-                raise Refused('catalog_route_paused')
             expected={'config':paths.config,'official':paths.official,'record':paths.record,'client':paths.client}
             sources=preview.get('sources')
             if type(sources) is not dict:raise Refused('request_target_mismatch')
             for name,source in sources.items():
                 path=source.get('path') if type(source) is dict else None
-                if name=='current_catalog':
+                if name in ('current_catalog','undo_catalog'):
+                    if name=='undo_catalog' and preview.get('action')!='undo':raise Refused('request_target_mismatch')
                     if type(path) is not str or not (path==str(paths.legacy) or settings._owned_catalog(paths,path)):raise Refused('request_target_mismatch')
                 elif name=='backup':
                     if preview.get('action')!='recover' or type(path) is not str or Path(path).parent!=paths.journal or Path(path).name!=str(preview.get('record_id'))+'.before':raise Refused('request_target_mismatch')
                 elif name not in expected or path!=str(expected[name]):raise Refused('request_target_mismatch')
             if set(sources)==set() or 'config' not in sources:raise Refused('request_target_mismatch')
             result=settings.apply(paths,preview,request['confirmation'],gate)
-        if op!='preview':result['catalog_route_paused']=not isolated
+        if op!='preview':result['catalog_route_paused']=False
         return {'schema':1,'ok':True,'result':result,'desktop_closed':closed,
                 'desktop_check':check,'isolated_test':isolated}
     except Refused as error:return {'schema':1,'ok':False,'error':str(error)}
