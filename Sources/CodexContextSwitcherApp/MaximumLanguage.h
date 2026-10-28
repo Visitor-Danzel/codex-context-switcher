@@ -7,6 +7,13 @@ static NSString *MaximumText(NSString *chinese) {
  static dispatch_once_t once;
  dispatch_once(&once, ^{
   translations=@{
+   @"撤销要恢复的模型清单已变化或缺失，已停止。当前配置和备份保留；请检查后再操作。":@"The catalog needed for Undo has changed or is missing. Undo stopped; the current configuration and backups are preserved. Check them before continuing.",
+   @"为每个模型分别选择 · 清单模式":@"Choose models individually · Catalog mode",
+   @"模型列表将使用本工具清单；Codex 更新后需重新生成清单。\n随附模型不代表账户实时可用；保存后重启 Codex，在新聊天中使用。\n实际容量请在 Codex 上下文圆环查看。":@"Codex will use this tool's model catalog; regenerate it after Codex updates.\nBundled models do not prove account access. Restart Codex and use a new chat.\nCheck the actual capacity in Codex's context indicator.",
+   @"清单已变化：%lu 个旧选择已移除或不再可扩展；保存后不再沿用。":@"Catalog changed: %lu previous selection(s) were removed or can no longer expand; they will not carry over after saving.",
+   @"将配置还原到上次保存之前；也可能恢复当时的旧模型清单。":@"Restore the configuration from before the last save; this may also restore the older model catalog used at that time.",
+   @"\n\n以下旧选择已移除或不再可扩展，保存后不再沿用：%@":@"\n\nThese previous selections were removed or can no longer expand and will not carry over after saving: %@",
+   @"\n\n清单方式会让 Codex 使用本工具的模型列表，并暂停原生在线模型发现；本工具不会自动获得新发布的模型。Codex 更新后需重新生成清单。\n\n只修改 config.toml 的模型清单路径；清单中只改选中模型的上下文值。先完全退出 Codex；保存后重开并使用新聊天。原始配置备份保留。":@"\n\nCatalog mode makes Codex use this tool's model list instead of native online discovery; newly released models are not discovered automatically. Regenerate the catalog after Codex updates.\n\nOnly the catalog path in config.toml is edited; only selected context values change inside the catalog. Fully quit Codex first, then reopen it and use a new chat. Original configuration backups are preserved.",
    @"清单方式已暂停；仅可检查状态或恢复默认。":@"Catalog mode is paused; only status checks and Defaults remain available.",
    @"当前使用 Codex 原生模型列表。逐模型上下文开关已暂停，尚无不接管清单的已验证方案。":@"Codex uses native model discovery. Per-model context switching is paused; a list-preserving replacement is not yet verified.",
    @"本工具的清单设置会接管原生模型列表，此方式已暂停。请退出 Codex 后点“恢复默认”撤回。":@"This tool's catalog overrides the native model list. This route is paused. Quit Codex, then use Defaults to withdraw it.",

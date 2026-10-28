@@ -66,6 +66,7 @@ static NSString *MaximumReason(NSString *reason) {
  @"source_changed":@"配置或模型资料已变化。没有覆盖这次变化，请刷新后重新操作。",
  @"preview_expired":@"确认等待超过两分钟，请重新操作。",
  @"external_change":@"其他程序修改了配置，自动撤销已暂停，避免覆盖它的修改。",
+ @"undo_catalog_unverified":@"撤销要恢复的模型清单已变化或缺失，已停止。当前配置和备份保留；请检查后再操作。",
  @"undo_unavailable":@"当前没有可以安全撤销的保存。",
  @"uncertain_previous_transaction":@"上次保存中途停止，结果需要检查。备份已保留，工具不会自动覆盖当前配置。",
  @"worker_unavailable":@"保存服务未能启动。请检查 Python 3.11 以上和系统沙箱是否可用。",
@@ -84,6 +85,7 @@ static NSString *MaximumReason(NSString *reason) {
 @property(nonatomic) NSArray<NSTextField *> *rangeLabels;
 @property(nonatomic) NSString *summarySource;
 @property(nonatomic) NSUInteger summaryCount;
+@property(nonatomic) NSUInteger omittedCount;
 @property(nonatomic) NSMenuItem *quitItem;
 @property(nonatomic) NSTextField *footnote;
 @property(nonatomic) NSScrollView *scroll;
@@ -111,7 +113,7 @@ static NSString *MaximumReason(NSString *reason) {
  self.window.title=MaximumText(@"最大上下文");self.window.releasedWhenClosed=NO;self.window.delegate=self;
  NSView *view=self.window.contentView;
  self.headingLabel=[self text:MaximumText(@"最大上下文") frame:NSMakeRect(24,511,450,36) size:25];[view addSubview:self.headingLabel];
- self.subtitleLabel=[self text:MaximumText(@"为每个模型分别选择；其他模型保留默认。") frame:NSMakeRect(24,482,610,24) size:14];[view addSubview:self.subtitleLabel];
+ self.subtitleLabel=[self text:MaximumText(@"为每个模型分别选择 · 清单模式") frame:NSMakeRect(24,482,610,24) size:14];[view addSubview:self.subtitleLabel];
  self.languagePicker=[[NSPopUpButton alloc] initWithFrame:NSMakeRect(512,515,124,28) pullsDown:NO];
  [self.languagePicker addItemsWithTitles:@[@"中文",@"English"]];self.languagePicker.target=self;self.languagePicker.action=@selector(changeLanguage:);
  self.languagePicker.accessibilityLabel=@"语言 / Language";[view addSubview:self.languagePicker];
@@ -122,7 +124,7 @@ static NSString *MaximumReason(NSString *reason) {
  self.undoButton=[self button:MaximumText(@"撤销上次保存") action:@selector(undo:) frame:NSMakeRect(272,96,145,34)];
  self.refreshButton=[self button:MaximumText(@"刷新") action:@selector(refresh:) frame:NSMakeRect(532,96,104,34)];
  for(NSButton *b in @[self.saveButton,self.defaultsButton,self.undoButton,self.refreshButton])[view addSubview:b];
- self.footnote=[self text:MaximumText(@"上方显示已保存的配置。保存后请重新打开 Codex，并使用新聊天。\n本工具不自动检测聊天实际容量，请在 Codex 上下文圆环中查看。") frame:NSMakeRect(24,36,612,48) size:12];self.footnote.textColor=NSColor.secondaryLabelColor;[view addSubview:self.footnote];
+ self.footnote=[self text:MaximumText(@"模型列表将使用本工具清单；Codex 更新后需重新生成清单。\n随附模型不代表账户实时可用；保存后重启 Codex，在新聊天中使用。\n实际容量请在 Codex 上下文圆环查看。") frame:NSMakeRect(24,24,612,60) size:11];self.footnote.textColor=NSColor.secondaryLabelColor;[view addSubview:self.footnote];
  [self updateControls];[self.window center];
 }
 - (void)renderSummary {
@@ -136,11 +138,11 @@ static NSString *MaximumReason(NSString *reason) {
 - (void)changeLanguage:(NSPopUpButton *)sender {
  MaximumEnglish=sender.indexOfSelectedItem==1;
  self.window.title=MaximumText(@"最大上下文");self.headingLabel.stringValue=self.window.title;
- self.subtitleLabel.stringValue=MaximumText([self.status[@"catalog_route_paused"] boolValue]?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择；其他模型保留默认。");
+ self.subtitleLabel.stringValue=MaximumText([self.status[@"catalog_route_paused"] boolValue]?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择 · 清单模式");
  self.saveButton.title=MaximumText(@"保存");self.defaultsButton.title=MaximumText(@"恢复默认");
  self.undoButton.title=MaximumText([self.status[@"transaction_state"] isEqual:@"uncertain"]?@"检查上次保存":@"撤销上次保存");
  self.refreshButton.title=MaximumText(@"刷新");self.quitItem.title=MaximumText(@"退出最大上下文");
- self.footnote.stringValue=MaximumText(@"上方显示已保存的配置。保存后请重新打开 Codex，并使用新聊天。\n本工具不自动检测聊天实际容量，请在 Codex 上下文圆环中查看。");
+ self.footnote.stringValue=MaximumText(@"模型列表将使用本工具清单；Codex 更新后需重新生成清单。\n随附模型不代表账户实时可用；保存后重启 Codex，在新聊天中使用。\n实际容量请在 Codex 上下文圆环查看。");
  NSArray *rows=self.status[@"models"] ?: @[];
  for(NSUInteger i=0;i<self.modelButtons.count && i<rows.count;i++) {
   NSDictionary *row=rows[i];NSButton *button=self.modelButtons[i];
@@ -155,7 +157,7 @@ static NSString *MaximumReason(NSString *reason) {
  NSString *state=self.status[@"state"];BOOL safe=[@[@"configured",@"default",@"legacy_configured",@"legacy_stale",@"catalog_outdated"] containsObject:state];
  BOOL uncertain=[self.status[@"transaction_state"] isEqual:@"uncertain"];
  BOOL paused=[self.status[@"catalog_route_paused"] boolValue];
- self.subtitleLabel.stringValue=MaximumText(paused?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择；其他模型保留默认。");
+ self.subtitleLabel.stringValue=MaximumText(paused?@"清单方式已暂停；仅可检查状态或恢复默认。":@"为每个模型分别选择 · 清单模式");
  BOOL allowed=compatible&&safe&&![self.status[@"configuration_conflict"] boolValue]&&!uncertain&&!self.busy;
  BOOL dirty=self.status && ![self.selection isEqual:[NSSet setWithArray:self.status[@"selected"] ?: @[]]];
  self.saveButton.enabled=allowed&&!paused&&(dirty||[state isEqual:@"legacy_stale"]||[state isEqual:@"catalog_outdated"]);
@@ -171,6 +173,7 @@ static NSString *MaximumReason(NSString *reason) {
  else if([state isEqual:@"other_catalog"] || [state isEqual:@"damaged_catalog"])[self setSummary:MaximumReason(state)];
  else if(paused && [state isEqual:@"default"])[self setSummary:@"当前使用 Codex 原生模型列表。逐模型上下文开关已暂停，尚无不接管清单的已验证方案。"];
  else if(paused)[self setSummary:@"本工具的清单设置会接管原生模型列表，此方式已暂停。请退出 Codex 后点“恢复默认”撤回。"];
+ else if(self.omittedCount>0 && [state isEqual:@"catalog_outdated"])[self setSummaryFormat:@"清单已变化：%lu 个旧选择已移除或不再可扩展；保存后不再沿用。" count:self.omittedCount];
  else if(dirty)[self setSummaryFormat:@"有未保存的选择 · 准备让 %lu 个模型使用最大上下文" count:(unsigned long)self.selection.count];
  else if([state isEqual:@"catalog_outdated"])[self setSummary:@"模型清单需要更新，原有勾选已保留。点“保存”更新后重开 Codex，新增模型才会进入列表。"];
  else if([state isEqual:@"default"])[self setSummary:@"当前配置：默认上下文。勾选模型后点“保存”。"];
@@ -179,7 +182,10 @@ static NSString *MaximumReason(NSString *reason) {
 }
 - (void)acceptStatus:(NSDictionary *)status {
  self.status=status;self.selection=[NSMutableSet setWithArray:status[@"selected"] ?: @[]];
- NSArray *rows=status[@"models"] ?: @[];CGFloat height=MAX(273,rows.count*48);
+ NSArray *rows=status[@"models"] ?: @[];NSMutableSet *eligible=[NSMutableSet new];
+ for(NSDictionary *row in rows)if([row[@"can_extend"] boolValue])[eligible addObject:row[@"slug"]];
+ NSMutableSet *omitted=[self.selection mutableCopy];[omitted minusSet:eligible];self.omittedCount=omitted.count;
+ [self.selection intersectSet:eligible];CGFloat height=MAX(273,rows.count*48);
  NSView *document=[[NSView alloc] initWithFrame:NSMakeRect(0,0,590,height)];NSMutableArray *buttons=[NSMutableArray new];NSMutableArray *ranges=[NSMutableArray new];
  NSUInteger index=0;
  for(NSDictionary *row in rows) {
@@ -221,8 +227,9 @@ static NSString *MaximumReason(NSString *reason) {
   NSAlert *alert=[NSAlert new];alert.messageText=[action isEqual:@"recover"]?MaximumText(@"检查上次中断的保存？"):([action isEqual:@"undo"]?MaximumText(@"撤销上次保存？"):([action isEqual:@"defaults"]?MaximumText(@"恢复默认上下文？"):MaximumText(@"保存最大上下文选择？")));
   BOOL withdraw=[self.status[@"catalog_route_paused"] boolValue]&&[action isEqual:@"defaults"];
   if(withdraw)alert.messageText=MaximumText(@"撤回本工具的模型清单设置？");
-  NSString *change=[action isEqual:@"save"]?[NSString stringWithFormat:MaximumText(@"以下 %lu 个模型使用最大上下文：\n%@\n其他模型使用默认值。"),(unsigned long)[preview[@"selected"] count],[preview[@"selected"] componentsJoinedByString:@"、"]]:([action isEqual:@"undo"]?MaximumText(@"将配置还原到上次保存之前。"):MaximumText(@"移除本工具的清单设置，恢复 Codex 内置默认值。"));
-  alert.informativeText=[action isEqual:@"recover"]?MaximumText(@"对照备份确认上次保存是否完成。只更新本工具的记录，不改 Codex 配置；如果配置被其他程序改动，将停止检查。请先完全退出 Codex，并关闭配置编辑器。"):[change stringByAppendingString:MaximumText(@"\n\n只修改 config.toml 的模型清单路径。先完全退出 Codex；保存后重新打开 Codex，在新聊天中使用。原始配置备份会保留。")];
+  NSString *change=[action isEqual:@"save"]?[NSString stringWithFormat:MaximumText(@"以下 %lu 个模型使用最大上下文：\n%@\n其他模型使用默认值。"),(unsigned long)[preview[@"selected"] count],[preview[@"selected"] componentsJoinedByString:@"、"]]:([action isEqual:@"undo"]?MaximumText(@"将配置还原到上次保存之前；也可能恢复当时的旧模型清单。"):MaximumText(@"移除本工具的清单设置，恢复 Codex 内置默认值。"));
+  alert.informativeText=[action isEqual:@"recover"]?MaximumText(@"对照备份确认上次保存是否完成。只更新本工具的记录，不改 Codex 配置；如果配置被其他程序改动，将停止检查。请先完全退出 Codex，并关闭配置编辑器。"):[change stringByAppendingString:MaximumText(@"\n\n清单方式会让 Codex 使用本工具的模型列表，并暂停原生在线模型发现；本工具不会自动获得新发布的模型。Codex 更新后需重新生成清单。\n\n只修改 config.toml 的模型清单路径；清单中只改选中模型的上下文值。先完全退出 Codex；保存后重开并使用新聊天。原始配置备份保留。")];
+  if([preview[@"omitted_selected"] count])alert.informativeText=[alert.informativeText stringByAppendingFormat:MaximumText(@"\n\n以下旧选择已移除或不再可扩展，保存后不再沿用：%@"),[preview[@"omitted_selected"] componentsJoinedByString:@"、"]];
   if(withdraw)alert.informativeText=MaximumText(@"只移除本工具写入的 model_catalog_json，恢复 Codex 原生模型发现；同时撤回本工具提供的最大上下文设置。其他配置不变，备份保留。\n\n请先完全退出 Codex 和官方 CLI，关闭配置编辑器；确认后重新打开 Codex。");
   [alert addButtonWithTitle:MaximumText(withdraw?@"确认恢复默认":@"确认保存")];[alert addButtonWithTitle:MaximumText(@"取消")];
   NSView *accessory=[[NSView alloc] initWithFrame:NSMakeRect(0,0,440,64)];
